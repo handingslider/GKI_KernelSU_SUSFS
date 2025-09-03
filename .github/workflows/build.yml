@@ -267,6 +267,9 @@ jobs:
             "NEXT")
               cd ./KernelSU-Next
               BASE_VERSION=10200
+            "SUKISU")
+              cd ./SukiSU-Ultra
+              BASE_VERSION=10200
               ;;
 
           esac
