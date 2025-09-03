@@ -145,6 +145,8 @@ jobs:
                 echo "BRANCH=-s next" >> $GITHUB_ENV
               elif [[ "${{ inputs.kernelsu_variant }}" == "WKSU" ]]; then
                 echo "BRANCH=-s wild" >> $GITHUB_ENV
+              elif [[ "${{ inputs.kernelsu_variant }}" == "SUKISU" ]]; then
+                echo "BRANCH=-s susfs-main" >> $GITHUB_ENV
               fi
               ;;
             "Other")
@@ -174,6 +176,10 @@ jobs:
             "NEXT")
               echo "Adding KernelSU Next..."
               curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash ${{ env.BRANCH }}
+              ;;
+            "SUKISU")
+              echo "Adding SukiSU Ultra..."
+              curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
               ;;
 
           esac
@@ -321,10 +327,12 @@ jobs:
           # Add KSU configuration settings
           echo "CONFIG_KSU=y" >> ./common/arch/arm64/configs/gki_defconfig
           
-          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WKSU" ]; then
+          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WKSU" ] || [ "${{ inputs.kernelsu_variant }}" == "SUKISU" ]; then
             echo "CONFIG_KSU_KPROBES_HOOK=n" >> ./common/arch/arm64/configs/gki_defconfig
           fi
-                    
+          if [ "${{ inputs.kernelsu_variant }}" == "SUKISU" ]; then
+            echo "CONFIG_KSU_MANUAL_HOOK=y" >> ./common/arch/arm64/configs/gki_defconfig
+          fi
           # Add additional tmpfs config setting
           echo "CONFIG_TMPFS_XATTR=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_TMPFS_POSIX_ACL=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -367,7 +375,7 @@ jobs:
           echo "CONFIG_KSU_SUSFS_SPOOF_CMDLINE_OR_BOOTCONFIG=y" >> ./common/arch/arm64/configs/gki_defconfig
           echo "CONFIG_KSU_SUSFS_OPEN_REDIRECT=y" >> ./common/arch/arm64/configs/gki_defconfig
 
-          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WKSU" ]; then
+          if [ "${{ inputs.kernelsu_variant }}" == "NEXT" ] || [ "${{ inputs.kernelsu_variant }}" == "WKSU" ] || [ "${{ inputs.kernelsu_variant }}" == "SUKISU" ]; then
             echo "CONFIG_KSU_SUSFS_SUS_SU=n" >> ./common/arch/arm64/configs/gki_defconfig
           else
             echo "CONFIG_KSU_SUSFS_SUS_SU=y" >> ./common/arch/arm64/configs/gki_defconfig
@@ -386,7 +394,7 @@ jobs:
               perl -pi -e 's/-maybe-dirty//g' ./build/kernel/kleaf/impl/stamp.bzl
               
               #Set Kernel Name
-              echo "CONFIG_LOCALVERSION=\"-${{ inputs.kernelsu_variant }}-$KSUVER-SUSFS-v1.5.9-Wild\"" >> ./common/arch/arm64/configs/gki_defconfig
+              echo "CONFIG_LOCALVERSION=\"-${{ inputs.kernelsu_variant }}-$PigguVerseSUSFS-1.5.9\"" >> ./common/arch/arm64/configs/gki_defconfig
 
               #Set Kernel Timestamp
               perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Sun Apr 20 04:20:00 UTC 2025"/' ./common/init/Makefile
@@ -421,8 +429,8 @@ jobs:
               perl -pi -e 's{UTS_VERSION="\$\(echo \$UTS_VERSION \$CONFIG_FLAGS \$TIMESTAMP \| cut -b -\$UTS_LEN\)"}{UTS_VERSION="#1 SMP PREEMPT Sun Apr 20 04:20:00 UTC 2025"}' ./common/scripts/mkcompile_h
           else
               #Set Kernel Name
-              perl -pi -e 's{echo "\${KERNELVERSION}\${file_localversion}\${config_localversion}\${LOCALVERSION}\${scm_version}"}{echo "${KERNELVERSION}${file_localversion}${config_localversion}${LOCALVERSION}${scm_version}-( ͡° ͜ʖ ͡°)-🦄-${{ inputs.kernelsu_variant }}:v'"$KSUVER"'-ඞ-SUSFS:v1.5.9-🥦💨-Wild"}' /scripts/setlocalversion
-              
+              perl -pi -e 's{echo "\${KERNELVERSION}\${file_localversion}\${config_localversion}\${LOCALVERSION}\${scm_version}"}{echo "${KERNELVERSION}${file_localversion}${config_localversion}${LOCALVERSION}${scm_version}-( ͡° ͜ʖ ͡°)-🦄-${{ inputs.kernelsu_variant }}:v'"$KSUVER"'-ඞ-PigguVerseSUSFS-1.5.9"}' /scripts/setlocalversion
+              echo "CONFIG_LOCALVERSION=\"-${{ inputs.kernelsu_variant }}-$PigguVerseSUSFS-1.5.9\"" >> ./common/arch/arm64/configs/gki_defconfig
               #Set Kernel Timestamp
               perl -pi -e 's/build-timestamp = \$\(or \$\(KBUILD_BUILD_TIMESTAMP\), \$\(build-timestamp-auto\)\)/build-timestamp = "Sun Apr 20 04:20:00 UTC 2025"/' ./common/init/Makefile
           fi
