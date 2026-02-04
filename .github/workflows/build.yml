@@ -108,8 +108,8 @@ jobs:
 
     - name: Clone AnyKernel3 and Other Dependencies
       run: |
-        ANYKERNEL_BRANCH="gki-2.0"
-        git clone https://github.com/WildKernels/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
+        ANYKERNEL_BRANCH="master"
+        git clone https://github.com/handingslider/AnyKernel3.git -b "$ANYKERNEL_BRANCH"
         rm -rf AnyKernel3/.git
         git clone https://github.com/WildKernels/kernel_patches.git
 
@@ -208,6 +208,9 @@ jobs:
             else
               curl -LSs "https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh" | bash -s main
             fi
+            ;;
+          SukiSU)
+            curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
             ;;
           RKSU)
             if [[ -n "${{ inputs.ksu_commit }}" ]]; then
@@ -436,6 +439,10 @@ jobs:
             cp "$SUSFS4KSU/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch" .
             patch -p1 < 10_enable_susfs_for_ksu.patch
             ;;
+          SukiSU)
+            SUSFS_VERSION="2.0.0"
+            cd "$KERNEL_ROOT/KernelSU"
+            echo "Nothing to fix in SukiSU"
         esac
 
     - name: Apply Performance Patches
@@ -723,6 +730,9 @@ jobs:
               ;;
             *)
               perl -i -0777 -pe 's/(.*)echo "\$res"/$1echo "\$res-Wild"/s' ./common/scripts/setlocalversion
+              ;;
+            PigguVerse)
+              perl -i -0777 -pe 's/(.*)echo "\$res"/$1echo "\$res-PigguVerse"/s' ./common/scripts/setlocalversion
               ;;
           esac
         else
