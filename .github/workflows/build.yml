@@ -330,10 +330,6 @@ jobs:
             patch -p1 < fix_ksu.c.patch
             echo "fixing ksud.c"
             patch -p1 < fix_ksud.c.patch
-            echo "fixing selinux.c"
-            patch -p1 < fix_selinux.c.patch
-            echo "fixing setuid_hook.c"
-            patch -p1 < fix_setuid_hook.c.patch
             echo "fixing sucompat.c"
             patch -p1 < fix_sucompat.c.patch
             echo "fixing supercalls.c"
